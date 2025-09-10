@@ -143,7 +143,7 @@ export default function JoinNow() {
               transition={{ delay: 0.2 }}
             >
               <div>
-                <h1 className="text-3xl font-bold text-white tracking-tight">Join NETWORTHWARS</h1>
+                <h1 className="text-3xl font-bold text-white tracking-tight">JOIN NETWORTHWARS</h1>
                 <p className="text-sm text-white/70 mt-1">Internship Application</p>
                 <div className="mt-3 w-48 h-1 bg-white/10 rounded-full overflow-hidden">
                   <motion.div
