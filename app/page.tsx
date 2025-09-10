@@ -71,11 +71,54 @@ export default function JoinNow() {
     e.preventDefault()
     setIsSubmitting(true)
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    try {
+      // Prepare form data for FormSubmit
+      const formData = new FormData()
 
-    setIsSubmitting(false)
-    setStep(3)
+      // Basic info
+      formData.append("name", form.name)
+      formData.append("email", form.gmail)
+      formData.append("phone", form.phone)
+      formData.append("linkedin", form.linkedin || "Not provided")
+      formData.append("resume", form.resume || "Not provided")
+      formData.append("role", roleLabel(form.role))
+
+      // Role-specific fields
+      if (form.role === "developer") {
+        formData.append("why_developer", form.developerWhy)
+        formData.append("github", form.developerGithub)
+        formData.append("developer_experience", form.developerExp)
+      } else if (form.role === "public") {
+        formData.append("why_public", form.publicWhy)
+        formData.append("campaign_examples", form.publicExamples)
+        formData.append("public_experience", form.publicExp)
+      } else if (form.role === "creator") {
+        formData.append("why_creator", form.creatorWhy)
+        formData.append("portfolio", form.creatorPortfolio)
+        formData.append("preferred_platforms", form.creatorPlatformPref)
+      }
+
+      // FormSubmit configuration
+      formData.append("_subject", `NETWORTHWARS Internship Application - ${form.name} (${roleLabel(form.role)})`)
+      formData.append("_captcha", "false")
+      formData.append("_template", "table")
+
+      const response = await fetch("https://formsubmit.co/ccidcop@gmail.com", {
+        method: "POST",
+        body: formData,
+      })
+
+      if (response.ok) {
+        setStep(3)
+      } else {
+        throw new Error("Submission failed")
+      }
+    } catch (error) {
+      console.error("Form submission error:", error)
+      alert("There was an error submitting your application. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const progress =
