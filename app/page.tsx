@@ -21,6 +21,7 @@ export default function JoinNow() {
     creatorWhy: "",
     creatorPortfolio: "",
     creatorPlatformPref: "",
+    termsAccepted: false,
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState({})
@@ -49,19 +50,23 @@ export default function JoinNow() {
 
     if (form.phone) completed.add("phone")
     if (form.role) completed.add("role")
+    if (form.termsAccepted) completed.add("terms")
 
     setErrors(newErrors)
     setCompletedFields(completed)
   }, [form, focusedField])
 
   function handleChange(e) {
-    const { name, value } = e.target
-    setForm((s) => ({ ...s, [name]: value }))
+    const { name, value, type, checked } = e.target
+    setForm((s) => ({
+      ...s,
+      [name]: type === "checkbox" ? checked : value,
+    }))
   }
 
   function goToRolePage() {
-    if (!form.name || !form.gmail || !form.phone || !form.role) {
-      alert("Please fill Name, Gmail, Phone and pick a Role before continuing.")
+    if (!form.name || !form.gmail || !form.phone || !form.role || !form.termsAccepted) {
+      alert("Please fill all required fields and accept the terms and conditions before continuing.")
       return
     }
     setStep(2)
@@ -125,38 +130,187 @@ export default function JoinNow() {
     step === 1 ? (Object.values(form).filter((v) => v).length / Object.keys(form).length) * 50 : step === 2 ? 75 : 100
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-dark-900 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 relative overflow-hidden">
       <EnhancedAnimatedBackground />
+
+      <motion.div
+        initial={{ opacity: 0, y: -30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="relative z-20 w-full"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4">
+          <div className="backdrop-blur-xl bg-gradient-to-r from-white/10 via-white/5 to-transparent border border-white/20 rounded-2xl p-6 lg:p-8 shadow-[0_0_40px_rgba(255,255,255,0.1)]">
+            <div className="text-center mb-6">
+              <motion.h1
+                className="text-4xl lg:text-6xl font-bold text-white mb-2 tracking-tight"
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2 }}
+              >
+                NETWORTHWARS
+              </motion.h1>
+              <motion.p
+                className="text-xl lg:text-2xl text-purple-300 font-medium"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+              >
+                Internship Program 2025
+              </motion.p>
+              <motion.div
+                className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-full bg-red-500/20 border border-red-400/30"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.6 }}
+              >
+                <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse" />
+                <span className="text-red-300 font-medium">Application Deadline: 15/10/2025</span>
+              </motion.div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+              {/* Program Overview */}
+              <motion.div
+                className="lg:col-span-2 space-y-6"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.8 }}
+              >
+                <div className="bg-black/20 rounded-xl p-6 border border-white/10">
+                  <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                    <span className="text-2xl">🚀</span>
+                    Program Overview
+                  </h3>
+                  <p className="text-white/80 leading-relaxed">
+                    Join NETWORTHWARS as an intern and be part of a revolutionary platform that's changing how people
+                    think about wealth and success. Work alongside industry experts, gain hands-on experience, and
+                    contribute to projects that impact thousands of users worldwide.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-black/20 rounded-xl p-5 border border-white/10">
+                    <h4 className="text-lg font-medium text-white mb-3 flex items-center gap-2">
+                      <span className="text-xl">⏰</span>
+                      Duration & Commitment
+                    </h4>
+                    <ul className="text-white/70 space-y-2 text-sm">
+                      <li>• 3-6 months internship period</li>
+                      <li>• Flexible working hours</li>
+                      <li>• Remote-first environment</li>
+                      <li>• Weekly team meetings</li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-black/20 rounded-xl p-5 border border-white/10">
+                    <h4 className="text-lg font-medium text-white mb-3 flex items-center gap-2">
+                      <span className="text-xl">🎯</span>
+                      What You'll Gain
+                    </h4>
+                    <ul className="text-white/70 space-y-2 text-sm">
+                      <li>• Industry experience & mentorship</li>
+                      <li>• Official completion certificate</li>
+                      <li>• Portfolio-worthy projects</li>
+                      <li>• Networking opportunities</li>
+                    </ul>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Available Roles */}
+              <motion.div
+                className="space-y-4"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 1 }}
+              >
+                <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                  <span className="text-2xl">👥</span>
+                  Available Roles
+                </h3>
+
+                {roles.map((role, index) => (
+                  <motion.div
+                    key={role.id}
+                    className="bg-black/20 rounded-xl p-4 border border-white/10 hover:border-purple-400/30 transition-all duration-300"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1.2 + index * 0.1 }}
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="text-2xl">{role.icon}</span>
+                      <h4 className="font-medium text-white">{role.label}</h4>
+                    </div>
+                    <p className="text-white/60 text-sm">{role.description}</p>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </div>
+
+            {/* Terms & Important Info */}
+            <motion.div
+              className="mt-8 bg-gradient-to-r from-purple-500/10 to-indigo-500/10 rounded-xl p-6 border border-purple-400/20"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.4 }}
+            >
+              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <span className="text-xl">📋</span>
+                Important Information
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                <div>
+                  <h4 className="font-medium text-purple-300 mb-2">Program Terms:</h4>
+                  <ul className="text-white/70 space-y-1">
+                    <li>• This is an unpaid internship position</li>
+                    <li>• Certificate provided upon successful completion</li>
+                    <li>• Maintain confidentiality of company information</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-medium text-purple-300 mb-2">Requirements:</h4>
+                  <ul className="text-white/70 space-y-1">
+                    <li>• Commitment to complete assigned tasks</li>
+                    <li>• Active participation in team discussions</li>
+                    <li>• Professional communication standards</li>
+                  </ul>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </motion.div>
 
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="relative z-20 max-w-4xl w-full px-6 py-10"
+        transition={{ duration: 0.6, delay: 0.5 }}
+        className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10"
       >
-        <div className="mx-auto rounded-3xl backdrop-blur-2xl bg-gradient-to-br from-white/10 via-white/5 to-transparent border border-white/20 p-10 shadow-[0_0_40px_rgba(255,255,255,0.1)]">
+        <div className="backdrop-blur-2xl bg-gradient-to-br from-white/10 via-white/5 to-transparent border border-white/20 rounded-3xl p-6 lg:p-10 shadow-[0_0_40px_rgba(255,255,255,0.1)]">
           {step !== 3 && (
             <motion.header
-              className="flex items-center justify-between mb-6"
+              className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.7 }}
             >
-              <div>
-                <h1 className="text-3xl font-bold text-white tracking-tight">JOIN NETWORTHWARS</h1>
-                <p className="text-sm text-white/70 mt-1">Internship Application</p>
-                <div className="mt-3 w-48 h-1 bg-white/10 rounded-full overflow-hidden">
+              <div className="flex-1">
+                <h2 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">Application Form</h2>
+                <p className="text-sm text-white/70 mt-1">Complete all steps to submit your application</p>
+                <div className="mt-4 w-full max-w-md h-2 bg-white/10 rounded-full overflow-hidden">
                   <motion.div
-                    className="h-full bg-gradient-to-r from-indigo-400 to-purple-500"
+                    className="h-full bg-gradient-to-r from-purple-500 to-indigo-500"
                     initial={{ width: 0 }}
                     animate={{ width: `${progress}%` }}
                     transition={{ duration: 0.5 }}
                   />
                 </div>
-                <p className="text-xs text-white/50 mt-1">{Math.round(progress)}% complete</p>
+                <p className="text-xs text-white/50 mt-2">{Math.round(progress)}% complete</p>
               </div>
               <div className="text-right">
-                <span className="text-xs text-white/60">Step {step} of 3</span>
+                <span className="text-xs text-white/60 bg-white/10 px-3 py-1 rounded-full">Step {step} of 3</span>
               </div>
             </motion.header>
           )}
@@ -168,7 +322,7 @@ export default function JoinNow() {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                className="rounded-2xl p-6 bg-gradient-to-b from-black/40 to-black/20 border border-white/10"
+                className="rounded-2xl p-4 lg:p-8 bg-gradient-to-b from-black/40 to-black/20 border border-white/10"
               >
                 <MainForm
                   form={form}
@@ -189,7 +343,7 @@ export default function JoinNow() {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                className="rounded-2xl p-6 bg-gradient-to-b from-black/40 to-black/20 border border-white/10"
+                className="rounded-2xl p-4 lg:p-8 bg-gradient-to-b from-black/40 to-black/20 border border-white/10"
               >
                 <RoleForm
                   form={form}
@@ -224,95 +378,97 @@ export default function JoinNow() {
 
 function MainForm({ form, onChange, roles, onNext, errors, completedFields, focusedField, setFocusedField }) {
   return (
-    <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-      <EnhancedField
-        label="Full Name"
-        id="name"
-        error={errors.name}
-        completed={completedFields.has("name")}
-        focused={focusedField === "name"}
-      >
-        <input
-          name="name"
-          value={form.name}
-          onChange={onChange}
-          onFocus={() => setFocusedField("name")}
-          onBlur={() => setFocusedField("")}
-          placeholder="Jane Doe"
-          className="w-full rounded-xl px-4 py-3 bg-black/30 border border-white/10 outline-none text-white placeholder-white/40 transition-all duration-300 focus:border-indigo-400/50 focus:bg-black/40"
-        />
-      </EnhancedField>
+    <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <EnhancedField
+          label="Full Name"
+          id="name"
+          error={errors.name}
+          completed={completedFields.has("name")}
+          focused={focusedField === "name"}
+        >
+          <input
+            name="name"
+            value={form.name}
+            onChange={onChange}
+            onFocus={() => setFocusedField("name")}
+            onBlur={() => setFocusedField("")}
+            placeholder="Jane Doe"
+            className="w-full rounded-xl px-4 py-3 bg-black/30 border border-white/10 outline-none text-white placeholder-white/40 transition-all duration-300 focus:border-purple-400/50 focus:bg-black/40 focus:ring-2 focus:ring-purple-400/20"
+          />
+        </EnhancedField>
 
-      <EnhancedField
-        label="Gmail"
-        id="gmail"
-        error={errors.gmail}
-        completed={completedFields.has("gmail")}
-        focused={focusedField === "gmail"}
-      >
-        <input
-          name="gmail"
-          value={form.gmail}
-          onChange={onChange}
-          onFocus={() => setFocusedField("gmail")}
-          onBlur={() => setFocusedField("")}
-          placeholder="you@gmail.com"
-          type="email"
-          className="w-full rounded-xl px-4 py-3 bg-black/30 border border-white/10 outline-none text-white placeholder-white/40 transition-all duration-300 focus:border-indigo-400/50 focus:bg-black/40"
-        />
-      </EnhancedField>
+        <EnhancedField
+          label="Gmail Address"
+          id="gmail"
+          error={errors.gmail}
+          completed={completedFields.has("gmail")}
+          focused={focusedField === "gmail"}
+        >
+          <input
+            name="gmail"
+            value={form.gmail}
+            onChange={onChange}
+            onFocus={() => setFocusedField("gmail")}
+            onBlur={() => setFocusedField("")}
+            placeholder="you@gmail.com"
+            type="email"
+            className="w-full rounded-xl px-4 py-3 bg-black/30 border border-white/10 outline-none text-white placeholder-white/40 transition-all duration-300 focus:border-purple-400/50 focus:bg-black/40 focus:ring-2 focus:ring-purple-400/20"
+          />
+        </EnhancedField>
 
-      <EnhancedField
-        label="Phone No"
-        id="phone"
-        completed={completedFields.has("phone")}
-        focused={focusedField === "phone"}
-      >
-        <input
-          name="phone"
-          value={form.phone}
-          onChange={onChange}
-          onFocus={() => setFocusedField("phone")}
-          onBlur={() => setFocusedField("")}
-          placeholder="+91 99999 99999"
-          className="w-full rounded-xl px-4 py-3 bg-black/30 border border-white/10 outline-none text-white placeholder-white/40 transition-all duration-300 focus:border-indigo-400/50 focus:bg-black/40"
-        />
-      </EnhancedField>
+        <EnhancedField
+          label="Phone Number"
+          id="phone"
+          completed={completedFields.has("phone")}
+          focused={focusedField === "phone"}
+        >
+          <input
+            name="phone"
+            value={form.phone}
+            onChange={onChange}
+            onFocus={() => setFocusedField("phone")}
+            onBlur={() => setFocusedField("")}
+            placeholder="+91 99999 99999"
+            className="w-full rounded-xl px-4 py-3 bg-black/30 border border-white/10 outline-none text-white placeholder-white/40 transition-all duration-300 focus:border-purple-400/50 focus:bg-black/40 focus:ring-2 focus:ring-purple-400/20"
+          />
+        </EnhancedField>
 
-      <EnhancedField label="LinkedIn Profile (optional)" id="linkedin">
-        <input
-          name="linkedin"
-          value={form.linkedin}
-          onChange={onChange}
-          placeholder="https://www.linkedin.com/in/yourname"
-          className="w-full rounded-xl px-4 py-3 bg-black/30 border border-white/10 outline-none text-white placeholder-white/40 transition-all duration-300 focus:border-indigo-400/50 focus:bg-black/40"
-        />
-      </EnhancedField>
+        <EnhancedField label="LinkedIn Profile (optional)" id="linkedin">
+          <input
+            name="linkedin"
+            value={form.linkedin}
+            onChange={onChange}
+            placeholder="https://www.linkedin.com/in/yourname"
+            className="w-full rounded-xl px-4 py-3 bg-black/30 border border-white/10 outline-none text-white placeholder-white/40 transition-all duration-300 focus:border-purple-400/50 focus:bg-black/40 focus:ring-2 focus:ring-purple-400/20"
+          />
+        </EnhancedField>
+      </div>
 
       <EnhancedField label="Resume URL (optional)" id="resume">
         <input
           name="resume"
           value={form.resume}
           onChange={onChange}
-          placeholder="https://drive.google.com/.."
-          className="w-full rounded-xl px-4 py-3 bg-black/30 border border-white/10 outline-none text-white placeholder-white/40 transition-all duration-300 focus:border-indigo-400/50 focus:bg-black/40"
+          placeholder="https://drive.google.com/your-resume-link"
+          className="w-full rounded-xl px-4 py-3 bg-black/30 border border-white/10 outline-none text-white placeholder-white/40 transition-all duration-300 focus:border-purple-400/50 focus:bg-black/40 focus:ring-2 focus:ring-purple-400/20"
         />
       </EnhancedField>
 
       <div>
-        <label className="block text-sm text-white/80 mb-3">Choose Role</label>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <label className="block text-sm font-medium text-white/80 mb-4">Choose Your Role</label>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {roles.map((r, index) => (
             <motion.label
               key={r.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              whileHover={{ scale: 1.02 }}
+              whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
-              className={`cursor-pointer select-none rounded-xl p-4 border transition-all duration-300 ${
+              className={`cursor-pointer select-none rounded-xl p-6 border transition-all duration-300 ${
                 form.role === r.id
-                  ? "bg-gradient-to-br from-indigo-500/20 to-purple-600/20 border-indigo-400/50 shadow-lg"
+                  ? "bg-gradient-to-br from-purple-500/20 to-indigo-600/20 border-purple-400/50 shadow-lg shadow-purple-500/20"
                   : "bg-black/20 border-white/10 hover:border-white/20 hover:bg-black/30"
               }`}
             >
@@ -325,24 +481,89 @@ function MainForm({ form, onChange, roles, onNext, errors, completedFields, focu
                 className="sr-only"
               />
               <div className="text-center">
-                <div className="text-2xl mb-2">{r.icon}</div>
-                <div className="text-sm font-medium text-white">{r.label}</div>
-                <div className="text-xs text-white/60 mt-1">{r.description}</div>
+                <div className="text-3xl mb-3">{r.icon}</div>
+                <div className="text-base font-semibold text-white mb-1">{r.label}</div>
+                <div className="text-xs text-white/60">{r.description}</div>
               </div>
             </motion.label>
           ))}
         </div>
       </div>
 
-      <div className="flex items-center justify-end pt-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="bg-gradient-to-r from-purple-500/10 to-indigo-500/10 rounded-xl p-6 border border-purple-400/20"
+      >
+        <label className="flex items-start gap-4 cursor-pointer group">
+          <div className="relative mt-1 flex-shrink-0">
+            <input
+              type="checkbox"
+              name="termsAccepted"
+              checked={form.termsAccepted}
+              onChange={onChange}
+              className="sr-only"
+            />
+            <motion.div
+              className={`w-6 h-6 rounded-full border-2 transition-all duration-300 flex items-center justify-center ${
+                form.termsAccepted
+                  ? "bg-gradient-to-r from-purple-500 to-indigo-600 border-purple-400"
+                  : "border-white/30 group-hover:border-white/50"
+              }`}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              {form.termsAccepted && (
+                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-3 h-3 bg-white rounded-full" />
+              )}
+            </motion.div>
+          </div>
+          <div className="text-sm text-white/80 leading-relaxed">
+            <span className="font-medium text-white">I agree to the terms and conditions:</span>
+            <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-white/70">
+              <ul className="space-y-2">
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-purple-400 rounded-full flex-shrink-0"></span>
+                  This is an unpaid internship position
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-purple-400 rounded-full flex-shrink-0"></span>
+                  NETWORTHWARS will provide a certificate upon completion
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-purple-400 rounded-full flex-shrink-0"></span>
+                  Commitment to complete assigned tasks and projects
+                </li>
+              </ul>
+              <ul className="space-y-2">
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-purple-400 rounded-full flex-shrink-0"></span>
+                  Maintain confidentiality of company information
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-purple-400 rounded-full flex-shrink-0"></span>
+                  Participate actively in team meetings and discussions
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-purple-400 rounded-full flex-shrink-0"></span>
+                  Professional communication standards
+                </li>
+              </ul>
+            </div>
+          </div>
+        </label>
+      </motion.div>
+
+      <div className="flex items-center justify-end pt-6">
         <motion.button
           type="button"
           onClick={onNext}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="rounded-full px-6 py-3 text-sm bg-gradient-to-r from-indigo-500/40 to-purple-600/40 border border-white/20 hover:from-indigo-500/60 hover:to-purple-600/60 transition-all duration-300 font-medium text-white shadow-lg"
+          className="rounded-full px-8 py-3 text-sm bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 transition-all duration-300 font-semibold text-white shadow-lg shadow-purple-500/25"
         >
-          Continue →
+          Continue to Role Details →
         </motion.button>
       </div>
     </form>
