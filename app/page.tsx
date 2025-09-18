@@ -38,17 +38,32 @@ export default function JoinNow() {
     const newErrors = {}
     const completed = new Set()
 
-    if (form.name) completed.add("name")
-    else if (form.name === "" && focusedField !== "name") newErrors.name = "Name is required"
+    if (form.name.trim()) {
+      completed.add("name")
+    } else {
+      newErrors.name = "Name is required"
+    }
 
-    if (form.gmail) {
+    if (form.gmail.trim()) {
       completed.add("gmail")
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.gmail)) {
         newErrors.gmail = "Please enter a valid email"
       }
+    } else {
+      newErrors.gmail = "Email is required"
     }
 
-    if (form.phone) completed.add("phone")
+    if (form.phone.trim()) {
+      const phoneDigits = form.phone.replace(/\D/g, "")
+      if (phoneDigits.length === 10) {
+        completed.add("phone")
+      } else {
+        newErrors.phone = "Phone number must be exactly 10 digits"
+      }
+    } else {
+      newErrors.phone = "Phone number is required"
+    }
+
     if (form.role) completed.add("role")
     if (form.termsAccepted) completed.add("terms")
 
@@ -65,10 +80,24 @@ export default function JoinNow() {
   }
 
   function goToRolePage() {
-    if (!form.name || !form.gmail || !form.phone || !form.role || !form.termsAccepted) {
-      alert("Please fill all required fields and accept the terms and conditions before continuing.")
+    const requiredErrors = []
+    if (!form.name.trim()) requiredErrors.push("Name")
+    if (!form.gmail.trim()) requiredErrors.push("Email")
+    if (!form.phone.trim()) requiredErrors.push("Phone number")
+    if (!form.role) requiredErrors.push("Role selection")
+    if (!form.termsAccepted) requiredErrors.push("Terms and conditions")
+
+    if (requiredErrors.length > 0) {
+      alert(`Please complete the following required fields: ${requiredErrors.join(", ")}`)
       return
     }
+
+    const phoneDigits = form.phone.replace(/\D/g, "")
+    if (phoneDigits.length !== 10) {
+      alert("Phone number must be exactly 10 digits")
+      return
+    }
+
     setStep(2)
   }
 
@@ -108,7 +137,7 @@ export default function JoinNow() {
       formData.append("_captcha", "false")
       formData.append("_template", "table")
 
-      const response = await fetch("https://formsubmit.co/ccidcop@gmail.com", {
+      const response = await fetch("https://formsubmit.co/founder.networthwars@gmail.com", {
         method: "POST",
         body: formData,
       })
@@ -381,7 +410,7 @@ function MainForm({ form, onChange, roles, onNext, errors, completedFields, focu
     <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <EnhancedField
-          label="Full Name"
+          label="Full Name *"
           id="name"
           error={errors.name}
           completed={completedFields.has("name")}
@@ -394,12 +423,13 @@ function MainForm({ form, onChange, roles, onNext, errors, completedFields, focu
             onFocus={() => setFocusedField("name")}
             onBlur={() => setFocusedField("")}
             placeholder="Jane Doe"
+            required
             className="w-full rounded-xl px-4 py-3 bg-black/30 border border-white/10 outline-none text-white placeholder-white/40 transition-all duration-300 focus:border-purple-400/50 focus:bg-black/40 focus:ring-2 focus:ring-purple-400/20"
           />
         </EnhancedField>
 
         <EnhancedField
-          label="Gmail Address"
+          label="Gmail Address *"
           id="gmail"
           error={errors.gmail}
           completed={completedFields.has("gmail")}
@@ -413,13 +443,15 @@ function MainForm({ form, onChange, roles, onNext, errors, completedFields, focu
             onBlur={() => setFocusedField("")}
             placeholder="you@gmail.com"
             type="email"
+            required
             className="w-full rounded-xl px-4 py-3 bg-black/30 border border-white/10 outline-none text-white placeholder-white/40 transition-all duration-300 focus:border-purple-400/50 focus:bg-black/40 focus:ring-2 focus:ring-purple-400/20"
           />
         </EnhancedField>
 
         <EnhancedField
-          label="Phone Number"
+          label="Phone Number *"
           id="phone"
+          error={errors.phone}
           completed={completedFields.has("phone")}
           focused={focusedField === "phone"}
         >
@@ -429,7 +461,9 @@ function MainForm({ form, onChange, roles, onNext, errors, completedFields, focu
             onChange={onChange}
             onFocus={() => setFocusedField("phone")}
             onBlur={() => setFocusedField("")}
-            placeholder="+91 99999 99999"
+            placeholder="9999999999 (10 digits only)"
+            pattern="[0-9]{10}"
+            maxLength="10"
             className="w-full rounded-xl px-4 py-3 bg-black/30 border border-white/10 outline-none text-white placeholder-white/40 transition-all duration-300 focus:border-purple-400/50 focus:bg-black/40 focus:ring-2 focus:ring-purple-400/20"
           />
         </EnhancedField>
@@ -456,7 +490,7 @@ function MainForm({ form, onChange, roles, onNext, errors, completedFields, focu
       </EnhancedField>
 
       <div>
-        <label className="block text-sm font-medium text-white/80 mb-4">Choose Your Role</label>
+        <label className="block text-sm font-medium text-white/80 mb-4">Choose Your Role *</label>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {roles.map((r, index) => (
             <motion.label
